@@ -1,15 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
-  <Document name="dc-sample.ZPM">
+  <Document name="observer-pattern.ZPM">
     <Module>
-      <Name>dc-sample</Name>
-      <Version>2.0.2</Version>
-      <Description>Basic InterSystems IRIS Development Template</Description>
+      <Name>observer-pattern</Name>
+      <Version>1.0.0</Version>
+      <Description>Observer pattern implementation for Objectscript.</Description>
       <Packaging>module</Packaging>
       <SourcesRoot>src</SourcesRoot>
-      <Resource Name="dc.sample.PKG"/>
-      <UnitTest Name="/tests" Package="dc.sample.unittests" Phase="test"/>
-
+      <Resource Name="dc.observer.PKG"/>
+      <Resource Name="eventobserver.INC" Directory="inc/"/>
+      <CSPApplication
+        Url="/csp/observerdemo"
+        SourcePath=""
+        DeployPath="${cspdir}observerdemo"
+        ServeFiles="1"
+        Recurse="1"
+        CookiePath="/csp/observerdemo/"
+        UseCookies="2"
+        MatchRoles=":${dbrole}"
+        PasswordAuthEnabled="0"
+        UnauthenticatedEnabled="1"
+      />
     </Module>
   </Document>
 </Export>
