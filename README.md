@@ -10,7 +10,7 @@
 
 This is an example of implementation of observer pattern for objectscript.  
 
-A DC article is availalbe in FR and EN.  
+A DC article is availalbe in [FR here](https://fr.community.intersystems.com/node/550801) and EN soon.  
 
 ## Installation
 
@@ -69,7 +69,7 @@ Do ##class(dc.observer.Manager).Subscribe("dc.observer.BasicTrigger",{"id":"123"
 ; Notify a Demo event
 Do ##class(dc.observer.Manager).Notify("Demo:OnTest",{})
 
-; the result
+; See the result
 zw ^dc.demo
 
 ```
