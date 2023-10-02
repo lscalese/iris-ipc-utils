@@ -45,10 +45,10 @@ ClassMethod Notify(
     Set NotifyObject = ##class(dc.observer.Manager).GenEventObject(Event)
     Set sc = $$$OK
 
-    Set node = $Name($$$Subscribed)
+    Set node = $Name($$$Subscribed(NotifyObject.EventType))
     For  {
         Set node = $Query(@node,1,value)
-        Quit:node=""
+        Quit:node=""||(NotifyObject.EventType'=$QSubscript(node,1))
         
         If $$$IsListener(value) {
             Set resourceName = $$$ResourceName(node)
@@ -62,7 +62,7 @@ ClassMethod Notify(
             Do $SYSTEM.Event.Signal(resourceName, NotifyObject.%ToJSON())
             Do NotifyObject.%Remove("Context"), NotifyObject.%Remove("Data")
         } Else {
-            If $ClassMethod($$$Class(node), $$$ToCleanMethod, NotifyObject,  $$$Context(value)) Kill @node Continue
+            If $ClassMethod($$$Class(node), $$$ToCleanMethod, NotifyObject, $$$Context(value)) Kill @node Continue
             Set sc = $$$ADDSC(sc,$ClassMethod($$$Class(node), $$$TriggerMethod, NotifyObject, Data, $$$Context(value)))
         }
     }
