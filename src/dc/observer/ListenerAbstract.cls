@@ -35,7 +35,7 @@ Method Wait(TimeOut As %Integer = {..#WAITTIMEOUT}) As %Integer
 {
     Set result = $SYSTEM.Event.WaitMsg(..ResourceName, TimeOut), returnCode = $ListGet(result,1)
 
-    If returnCode = 0 || (returnCode = -1) Quit returnCode
+    If returnCode < 1 Quit returnCode
     
     Set Event = {}.%FromJSON($ListGet(result,2))
     Set Data = Event.Data, Context = Event.Context
@@ -59,7 +59,7 @@ Method WaitEvent(
 {
     Set result = $SYSTEM.Event.WaitMsg(..ResourceName, TimeOut), returnCode = $ListGet(result,1), Event = ""
 
-    If returnCode = 0 || (returnCode = -1) Quit returnCode
+    If returnCode < 1 Quit returnCode
     
     Set Event = {}.%FromJSON($ListGet(result,2))
     
