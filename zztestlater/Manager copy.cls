@@ -1,7 +1,9 @@
-Include eventobserver
+Include ipcutils
 
-Class dc.observer.Manager
+Class dc.ipcutils.Manager copy
 {
+
+Parameter ACKTIMEOUT = 3;
 
 ClassMethod Subscribe(
 	Observer As %String,
@@ -42,7 +44,7 @@ ClassMethod Notify(
     
     #dim NotifyObject As %DynamicObject
     
-    Set NotifyObject = ##class(dc.observer.Manager).GenEventObject(Event)
+    Set NotifyObject = ##class(dc.ipcutils.Manager).GenEventObject(Event)
     Set sc = $$$OK
 
     Set node = $Name($$$Subscribed(NotifyObject.EventType))
@@ -52,26 +54,52 @@ ClassMethod Notify(
         
         If $$$IsListener(value) {
             Set resourceName = $$$ResourceName(node)
-            If '$System.Event.Defined(resourceName) Kill @node Continue
-            If '$Data(^$JOB($ListGet(value, 4))) {
-                Do:$SYSTEM.Event.Defined(resourceName) $SYSTEM.Event.Clear(resourceName), $SYSTEM.Event.Delete(resourceName)
-                Kill @node
-                Continue
-            }
             Set NotifyObject.Context = $$$Context(value), NotifyObject.Data = Data
+            
+            If '$System.Event.Defined(resourceName) || '$Data(^$JOB($ListGet(value, 4))) Do UnSubscribe Continue
             Do $SYSTEM.Event.Signal(resourceName, NotifyObject.%ToJSON())
-            Do NotifyObject.%Remove("Context"), NotifyObject.%Remove("Data")
+            Do WaitAck
+
+            Do NotifyObject.%Remove("Context"), NotifyObject.%Remove("Data")            
+            
         } Else {
             If $ClassMethod($$$Class(node), $$$ToCleanMethod, NotifyObject, $$$Context(value)) Kill @node Continue
             Set sc = $$$ADDSC(sc,$ClassMethod($$$Class(node), $$$TriggerMethod, NotifyObject, Data, $$$Context(value)))
         }
     }
     Quit sc
+
+UnSubscribe
+    Do:$SYSTEM.Event.Defined(resourceName) $SYSTEM.Event.Clear(resourceName), $SYSTEM.Event.Delete(resourceName)
+    Kill @node
+    Quit
+
+WaitAck
+    Set start = $zh, match = $$$NO
+    Do {
+        Set syncResult = $SYSTEM.Event.WaitMsg("", ..#ACKTIMEOUT)
+        Set syncStatus = $ListGet(syncResult, 1)
+        If syncStatus < 1 Do UnSubscribe Quit    
+        Set msg = {}.%FromJSON($ListGet(syncResult, 2))
+        Set match = msg.MessageID = NotifyObject.MessageID ; Ok this the expected ack
+        Quit:match
+    } While (start + ..#ACKTIMEOUT > $zh)
+
+    Do:'match UnSubscribe
+
+    Quit
 }
 
 ClassMethod GenEventObject(Event As %String) As %DynamicObject
 {
-    Quit {"Event":(Event),"EventType":($Piece(Event,":",1)),"EventName":($Piece(Event,":",2)),"PIDSource":($JOB),"Timestamp":($ZDateTime($Horolog,3,1))}
+    Quit {
+        "Event":(Event),
+        "EventType":($Piece(Event,":",1)),
+        "EventName":($Piece(Event,":",2)),
+        "PIDSource":($JOB),
+        "Timestamp":($ZDateTime($Horolog,3,1)),
+        "MessageID":($Increment(^dc.ipcutils.msg)) 
+    }
 }
 
 ClassMethod HashContext(Context As %DynamicObject) As %String [ CodeMode = expression, Internal, Private ]

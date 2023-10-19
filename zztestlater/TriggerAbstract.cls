@@ -1,4 +1,4 @@
-Class dc.observer.TriggerAbstract [ Abstract ]
+Class dc.ipcutils.TriggerAbstract [ Abstract ]
 {
 
 Parameter EVENTTYPE;

@@ -1,4 +1,4 @@
-Class dc.observer.BasicTrigger Extends dc.observer.TriggerAbstract
+Class dc.ipcutils.BasicTrigger Extends dc.ipcutils.TriggerAbstract
 {
 
 Parameter EVENTTYPE = "Demo";

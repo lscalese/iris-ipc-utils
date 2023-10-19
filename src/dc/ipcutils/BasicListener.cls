@@ -1,14 +1,14 @@
 /// Basic Listener for demo purpose<br/>
 /// Open a terminal: <br/>
-/// Set listener = ##class(dc.observer.BasicListener).%New()<br/>
+/// Set listener = ##class(dc.ipcutils.BasicListener).%New()<br/>
 /// Do listener.Listen()<br/>
-/// or in one line : Do ##class(dc.observer.BasicListener).%New().Listen()<br/>
+/// or in one line : Do ##class(dc.ipcutils.BasicListener).%New().Listen()<br/>
 /// Type ctrl+c to stop.<br/>
 /// Open anoter terminal:<br/>
-/// Do ##class(dc.observer.Manager).Notify("Demo:OnTestString","This is string notification")<br/>
-/// Do ##class(dc.observer.Manager).Notify("Demo","This is a demo notification")<br/>
-/// Do ##class(dc.observer.Manager).Notify("Demo:OnTestObject",{"object":"demo"})<br/>
-Class dc.observer.BasicListener Extends dc.observer.ListenerAbstract
+/// Do ##class(dc.ipcutils.Manager).Notify("Demo:OnTestString","This is string notification")<br/>
+/// Do ##class(dc.ipcutils.Manager).Notify("Demo","This is a demo notification")<br/>
+/// Do ##class(dc.ipcutils.Manager).Notify("Demo:OnTestObject",{"object":"demo"})<br/>
+Class dc.ipcutils.BasicListener Extends dc.ipcutils.ListenerAbstract
 {
 
 Parameter EVENTTYPE = "Demo";
@@ -25,9 +25,8 @@ Method Listen() As %Status
     } Catch Ex {
         If Ex.Name '[ "<INTERRUPT>" Set sc = Ex.AsStatus()
         If ..Verbose, $$$ISERR(sc) Do $SYSTEM.Status.DisplayError(sc)
-        Do ..OnStopListen()
     }
-    Quit sc
+    Quit $$$ADDSC(sc,..OnStopListen())
 }
 
 Method Update(
@@ -39,7 +38,7 @@ Method Update(
     Write:..Verbose !,dt," + Update received!"
     Write !,dt, " = Event : ", !
     Do ##class(%JSON.Formatter).%New().Format(Event)
-    Write !,dt, " = Conext : ", !
+    Write !,dt, " = Context : ", !
     Do ##class(%JSON.Formatter).%New().Format(Context)
     Write !,dt, " = Data : ", !
     Do ##class(%JSON.Formatter).%New().Format(Data)
