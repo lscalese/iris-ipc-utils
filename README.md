@@ -8,7 +8,7 @@
 
 ## Description
 
-This is an example of implementation of observer pattern for objectscript.  
+This is an example of $SYSTEM.Event usage.  
 
 A DC article is availalbe in [FR here](https://fr.community.intersystems.com/node/550801) and EN soon.  
 
@@ -17,7 +17,7 @@ A DC article is availalbe in [FR here](https://fr.community.intersystems.com/nod
 Clone/git pull the repo into any local directory
 
 ```
-$ git clone https://github.com/lscalese/observer-pattern-for-objectscript.git
+$ git clone https://github.com/lscalese/iris-ipc-utils.git
 ```
 
 ```
@@ -31,13 +31,13 @@ $ docker-compose up -d
 Open a terminal a start to listen the event "Demo"
 
 ```Objectscript
-IRISAPP>Do ##class(dc.observer.BasicListener).%New().Listen()
+IRISAPP>Do ##class(dc.ipcutils.BasicListener).%New().Listen()
 ```
 
 Open a second terminal to send a notification : 
 
 ```Objectscript
-Do ##class(dc.observer.Manager).Notify("Demo:OnTest",{"Message":"My FirstTest"}.%ToJSON())
+Do ##class(dc.ipcutils.Manager).Notify("Demo:OnTest",{"Message":"My FirstTest"}.%ToJSON())
 ```
 
 Now you see the result in the first terminal:
@@ -58,18 +58,4 @@ IRISAPP>Do ##class(dc.observer.BasicListener).%New().Listen()
   },
   "Data":"{\"Message\":\"My FirstTest\"}"
 }
-```
-
-## With a subscribed class
-
-```
-; Subscribe the triggeer class
-Do ##class(dc.observer.Manager).Subscribe("dc.observer.BasicTrigger",{"id":"123"})
-
-; Notify a Demo event
-Do ##class(dc.observer.Manager).Notify("Demo:OnTest",{})
-
-; See the result
-zw ^dc.demo
-
 ```
